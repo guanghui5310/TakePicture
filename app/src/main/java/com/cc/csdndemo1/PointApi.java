@@ -17,11 +17,15 @@ import retrofit2.http.PartMap;
 public interface PointApi {
 
     @Multipart
-    @POST("New_work_order/uploadFile")
+    @POST("takePicture/uploadFile")
     Observable<ResponseObj<Boolean>> uploadFile(@PartMap Map<String, InputStream> map);
 
     @Multipart
-    @POST("New_work_order/uploadFile")
+    @POST("takePicture/uploadFile")
     Observable<ResponseObj<Boolean>> uploadFile2(@PartMap Map<String, RequestBody> files);
+
+    @Multipart
+    @POST("takePicture/picture")
+    Observable<ResponseObj<Boolean>> uploadPicture(@PartMap Map<String, RequestBody> files);
 
 }

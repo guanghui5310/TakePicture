@@ -24,7 +24,7 @@ public class ApiManager {
     public PointApi pointApiService() {
         if (pointApi == null) {
             pointApi = new Retrofit.Builder()
-                    .baseUrl("http://172.16.108.22:10002/")
+                    .baseUrl("http://172.16.108.22:10004/")
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

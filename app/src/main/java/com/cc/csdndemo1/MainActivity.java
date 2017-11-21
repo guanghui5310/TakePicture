@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.takephotoTV)
     Button takephotoTV;
+    @BindView(R.id.savephotoTV)
+    Button savephotoTV;
     @BindView(R.id.imageIV)
     ImageView imageIV;
 
@@ -84,8 +86,9 @@ public class MainActivity extends AppCompatActivity {
 
         ApiManager.getInstance()
                 .pointApiService()
-                .uploadFile(files)
+//                .uploadFile(files)
 //                .uploadFile2(map)
+                .uploadPicture(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new io.reactivex.functions.Consumer<ResponseObj<Boolean>>() {
@@ -112,12 +115,15 @@ public class MainActivity extends AppCompatActivity {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);//质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
         int options = 100;
-        while (baos.toByteArray().length / 1024 > 500) {  //循环判断如果压缩后图片是否大于500kb,大于继续压缩
-            baos.reset();//重置baos即清空baos
-            options -= 10;//每次都减少10
-            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中
-            long length = baos.toByteArray().length;
-        }
+
+        //循环判断如果压缩后图片是否大于500kb,大于继续压缩;不进行压缩的话调过这段代码
+//        while (baos.toByteArray().length / 1024 > 500) {
+//            baos.reset();//重置baos即清空baos
+//            options -= 10;//每次都减少10
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中
+//            long length = baos.toByteArray().length;
+//        }
+
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         Date date = new Date(System.currentTimeMillis());
         String filename = format.format(date);
