@@ -22,7 +22,7 @@
 
     <Button
         android:id="@+id/savephotoTV"
-        android:text="上传图片"
+        android:text="上传文件，不是上传图片"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

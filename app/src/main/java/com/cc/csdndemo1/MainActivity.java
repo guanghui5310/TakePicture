@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -49,11 +52,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @OnClick(R.id.takephotoTV)
-    public void onClick() {
-        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+    @OnClick({R.id.takephotoTV, R.id.savephotoTV})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.takephotoTV:
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                break;
+            case R.id.savephotoTV:
+                getFile();
+                break;
+        }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -64,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         /**
+         * Map<String, InputStream>
          * 方法一
          */
         File file = compressImage(bitmap);
@@ -74,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         files.put(file.getName() + "\"; filename=\"" + file.getName(), inputStream);
 
         /**
+         * Map<String, RequestBody>
          * 方法二：map里的key必须是file.getName() + "\"; filename=\"" + file.getName()这样
          * 这样才能在后台的方法中接收到，具体是为什么有待研究
          */
@@ -86,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
         ApiManager.getInstance()
                 .pointApiService()
-//                .uploadFile(files)
-//                .uploadFile2(map)
+//                .uploadPicture1(files)
+//                .uploadPicture2(map)
                 .uploadPicture(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -143,6 +156,62 @@ public class MainActivity extends AppCompatActivity {
         return file;
     }
 
+
+    /**
+     * 选择手机指定目录文件上传到电脑
+     */
+    public void getFile() {
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        File file = null;
+        String name = "拍照姿势大全，50条顶级秘籍.txt";
+        String path = Environment.getExternalStorageDirectory().getPath() + "/" + name;
+        try {
+            file = new File(path);
+            fis = new FileInputStream(file);
+            Log.e("MainActivity", String.valueOf(fis.available()));
+
+            /**
+             * 方法一：如果使用InputStream传的话，会丢失大部分数据
+             * 测试中，一个2946kb的文件传到后台只有2kb了
+             */
+            Map<String, InputStream> files = new HashMap<>();
+            files.put(name + "\"; filename=\"" + name, fis);
+
+            /**
+             * 方法二：使用RequestBody传的话，不会丢失数据，可以正常写到后台
+             */
+            Map<String, RequestBody> map = new HashMap<>();
+            String ext = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+            RequestBody requestBody = RequestBody.create(MediaType.parse("image/" + ext), file);
+            map.put(file.getName() + "\"; filename=\"" + file.getName(), requestBody);
+
+            ApiManager.getInstance()
+                    .pointApiService()
+//                    .uploadFile(files)
+                    .uploadFile1(map)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<ResponseObj<Boolean>>() {
+                        @Override
+                        public void accept(ResponseObj<Boolean> booleanResponseObj) throws Exception {
+                            Log.e("MainActivity", booleanResponseObj.data.toString());
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            Log.e("MainActivity", throwable.getMessage());
+                        }
+                    });
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 
 }
