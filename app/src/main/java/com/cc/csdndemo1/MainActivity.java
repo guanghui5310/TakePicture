@@ -74,6 +74,18 @@ public class MainActivity extends AppCompatActivity {
             imageIV.setImageBitmap(bitmap);
         }
 
+
+        uploadPicture(bitmap);
+
+
+
+    }
+
+
+    /**
+     * 上传图片
+     */
+    public void uploadPicture(Bitmap bitmap) {
         /**
          * Map<String, InputStream>
          * 方法一
@@ -101,7 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 .pointApiService()
 //                .uploadPicture1(files)
 //                .uploadPicture2(map)
-                .uploadPicture(map)
+//                .uploadPicture(map)
+                .uploadPicture3("photo1111", map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new io.reactivex.functions.Consumer<ResponseObj<Boolean>>() {
@@ -115,45 +128,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("MainActivity", "throwable:" + throwable);
                     }
                 });
-
-    }
-
-
-    /**
-     * 压缩图片（质量压缩）
-     *
-     * @param bitmap
-     */
-    public File compressImage(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);//质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
-        int options = 100;
-
-        //循环判断如果压缩后图片是否大于500kb,大于继续压缩;不进行压缩的话调过这段代码
-//        while (baos.toByteArray().length / 1024 > 500) {
-//            baos.reset();//重置baos即清空baos
-//            options -= 10;//每次都减少10
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中
-//            long length = baos.toByteArray().length;
-//        }
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = new Date(System.currentTimeMillis());
-        String filename = format.format(date);
-        File file = new File(Environment.getExternalStorageDirectory(), filename + ".png");
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            try {
-                fos.write(baos.toByteArray());
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return file;
     }
 
 
@@ -203,8 +177,6 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("MainActivity", throwable.getMessage());
                         }
                     });
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -213,5 +185,43 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
+    /**
+     * 压缩图片（质量压缩）
+     *
+     * @param bitmap
+     */
+    public File compressImage(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);//质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
+        int options = 100;
+
+        //循环判断如果压缩后图片是否大于500kb,大于继续压缩;不进行压缩的话调过这段代码
+//        while (baos.toByteArray().length / 1024 > 500) {
+//            baos.reset();//重置baos即清空baos
+//            options -= 10;//每次都减少10
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中
+//            long length = baos.toByteArray().length;
+//        }
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = new Date(System.currentTimeMillis());
+        String filename = format.format(date);
+        File file = new File(Environment.getExternalStorageDirectory(), filename + ".png");
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            try {
+                fos.write(baos.toByteArray());
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
 
 }
