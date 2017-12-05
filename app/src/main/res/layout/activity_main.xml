@@ -21,10 +21,19 @@
         android:layout_height="300dp"/>
 
     <Button
-        android:id="@+id/savephotoTV"
-        android:text="上传文件，不是上传图片"
+        android:id="@+id/savePhoto"
+        android:text="上传图片"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/saveTxt"
+        android:text="上传txt文件"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
 
 </LinearLayout>
